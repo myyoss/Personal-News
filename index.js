@@ -5,39 +5,39 @@ const cheerio = require("cheerio");
 
 const app = express();
 
+const cors = require('cors')
+app.use(cors())
+
 
 const webpages = [{
     name: "ynet",
     address: "https://www.ynet.co.il/sport/worldsoccer",
 }]
 
-const articles = [];
-
-webpages.forEach(webpage => {
-    axios
-        .get(webpage.address)
-        .then((res) => {
-            const html = res.data
-            const $ = cheerio.load(html)
-            $('div.slotView', html).each(function () {
-                const title = $(this).text();
-                const url = $(this).find('a').attr("href");
-                const img = $(this).find('img').attr('src');
-                articles.push({
-                    title,
-                    url,
-                    img,
-                    source: webpage.name
-                });
-            });
-        }).catch((err) => console.log(err));
-});
 
 
 app.get("/", (req, res) => {
-    res.json(articles);
-    // res.send(articles);
-    console.log(articles)
+    webpages.forEach(webpage => {
+        axios
+        .get(webpage.address)
+        .then((response) => {
+            const html = response.data
+            const $ = cheerio.load(html)
+            const articles = []
+                $('div.slotView', html).each(function () {
+                    const title = $(this).text();
+                    const url = $(this).find('a').attr("href");
+                    const img = $(this).find('img').attr('src');
+                    articles.push({
+                        title,
+                        url,
+                        img,
+                        source: webpage.name
+                    });
+                });
+                res.json(articles)
+            }).catch((err) => console.log(err));
+    });
 })
 
 
