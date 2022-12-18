@@ -1,2 +1,2 @@
 # Personal-News
-Set Your Personal News
+Set Your Own Personal News API
